@@ -1,88 +1,93 @@
-/* .question-card styling */
 .question-card {
-  background-color: #f9f9f9; /* Light gray background for the card */
-  border-radius: 10px; /* Rounded corners */
-  padding: 20px;
+  background-color: #f9f9f9;
+  border-radius: 10px;
+  padding: 30px 25px;
   max-width: 90%;
-  width: 505px; /* Fixed width for the card */
-  height: 505px; /* Fixed height for the card */
-  margin: 20px auto; /* Center the card on the page */
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Subtle shadow for card */
+  width: 505px;
+  height: 200px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  align-items: center;
+  text-align: center;
 }
 
-/* Style for question label */
+
 .question-label {
   font-weight: bold;
-  margin-bottom: 12px;
+  font-size: 18px;
+  margin-top: 20px;
+}
+
+
+.options-wrapper {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 30px; 
+}
+
+
+.question-card label {
+  display: flex;
+  align-items: center;
   font-size: 16px;
+  line-height: 1.5;
+  cursor: pointer;
 }
 
-/* Styling for options (Radio Buttons / Checkboxes) */
-.option {
-  display: block;
-  margin: 10px 0;
+input[type='radio'],
+input[type='checkbox'] {
+  margin-right: 10px;
 }
 
-/* Styling for input fields */
+
 .input {
   padding: 10px;
   width: 100%;
+  max-width: 400px;
   box-sizing: border-box;
-  margin-top: 10px;
+  margin-bottom: 30px; 
 }
 
-/* Error text styling */
-.error-text {
+
+.error {
   color: red;
   font-size: 14px;
+  margin-top: 5px;
+  text-align: left;
+  width: 100%;
 }
 
-/* Button container to place buttons at the bottom */
+
 .nav-buttons-container {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 20px; /* Gaps between buttons */
-  margin-top: 15px;
+  width: 100%;
+  gap: 15px;
 }
 
-/* Styling for both buttons */
 .nav-buttons-container button {
   padding: 10px 20px;
   font-size: 16px;
   cursor: pointer;
   border: none;
   border-radius: 5px;
-  background-color: #4CAF50; /* Green background */
+  background-color: #4CAF50;
   color: white;
   transition: background-color 0.3s ease;
 }
 
 .nav-buttons-container button:hover {
-  background-color: #45a049; /* Darker green on hover */
+  background-color: #45a049;
 }
 
 .nav-buttons-container button:disabled {
-  background-color: #ccc; /* Disabled button color */
+  background-color: #ccc;
   cursor: not-allowed;
-}
-
-/* Additional style for the error message */
-.error {
-  color: red;
-  font-size: 14px;
-  margin-top: 5px;
-}
-
-/* If the question has options (radio/checkboxes) */
-.question-card label {
-  display: block; /* Ensure each option is on a new line */
-  margin: 8px 0;
-}
-
-input[type='radio'], input[type='checkbox'] {
-  margin-right: 8px;
 }

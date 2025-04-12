@@ -40,7 +40,11 @@ const QuestionCard = ({ question, value, onChange, error }) => {
   return (
     <div className="question-card">
       <p className="question-label">{question.question}</p>
-      {question.options ? renderOptions() : (
+      {question.options ? (
+        <div className="options-wrapper">
+          {renderOptions()}
+        </div>
+      ) : (
         <input
           className="input"
           type="text"
