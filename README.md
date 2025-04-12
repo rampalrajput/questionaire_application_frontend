@@ -1,44 +1,5 @@
 Smart QuizWise (questionaries_application_frontend)
 
-A dynamic, multi-step questionnaire React application with interactive UI, animations, and form validation. Allows users to enter their name and email, navigate through various question types, track progress, and review their responses before submission.
-
-🚀 Features
-
-Landing Page: Collects user name and email.
-
-Multi-Step Form: Supports text, date, numeric, and multiple-choice questions.
-
-Dynamic Flow: Next questions depend on previous answers.
-
-Progress Bar: Visual indicator of completion.
-
-Navigation: Next and Previous buttons for smooth transitions.
-
-Form Validation: Required and optional fields with inline error messages.
-
-Summary Page: Review all answers before final submission.
-
-Animations: Smooth page and component transitions using Framer Motion.
-
-Global State: Managed via React Context API.
-
-React (v18+)
-
-Vite (for fast development)
-
-React Router DOM (v6)
-
-Framer Motion (animations)
-
-SCSS / CSS Modules (styles)
-
-React Context API (state management)
-
-⚙️ Prerequisites
-
-Node.js (v14 or later)
-
-npm (v6 or later) or yarn
 
 🔧 Installation
 
