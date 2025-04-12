@@ -8,7 +8,7 @@ import QuestionCard from '../../components/card/QuestionCard'
 import NavigationButtons from '../../components/navigation/navigationButtons'
 import AnimatedWrapper from '../../components/animatedWrappers'
 import { validateQuestion } from '../../utils/validation'
-//import './questionPage.css'
+import './questionPage.css'
 
 const QuestionsPage = () => {
 
@@ -21,7 +21,7 @@ const QuestionsPage = () => {
   const totalSteps = questions.length
 
   const handleNext = () => {
-    // Validate all questions in this step
+  
     const newErrors = {}
     currentStepQuestions.forEach((q) => {
       const value = answers[q.id]
@@ -34,7 +34,6 @@ const QuestionsPage = () => {
       return
     }
 
-    // Clear errors and move on
     setErrors({})
     if (step < totalSteps - 1) {
       setStep((prev) => prev + 1)
@@ -52,7 +51,6 @@ const QuestionsPage = () => {
 
   const handleChange = (questionId, value) => {
     updateAnswer(questionId, value)
-    // Clear error for this question as soon as it's changed
     if (errors[questionId]) {
       setErrors((prev) => {
         const { [questionId]: _, ...rest } = prev

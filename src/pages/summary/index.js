@@ -14,7 +14,6 @@ const SummaryPage = () => {
 
   const handleSubmit = () => {
     alert('Your test have been submitted successfully!')
-    // You can add API call here to submit data
     navigate('/')
   }
 

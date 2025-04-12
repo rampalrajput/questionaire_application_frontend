@@ -1,6 +1,6 @@
 import React from 'react'
 import InputField from '../Inputfield'
-import './QuestionsCard.css'   // make sure .question-card styles live here
+import './QuestionsCard.css' 
 
 const QuestionCard = ({ question, value, onChange, error }) => {
   return (
