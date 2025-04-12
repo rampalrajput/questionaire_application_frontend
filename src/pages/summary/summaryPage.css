@@ -1,0 +1,17 @@
+.summary-section {
+    margin-top: 1rem;
+    padding: 1rem;
+    background-color: #f9f9ff;
+    border-radius: 8px;
+  
+    .input-group {
+      margin-bottom: 1rem;
+      line-height: 1.6;
+  
+      strong {
+        display: block;
+        color: #111;
+      }
+    }
+  }
+  
