@@ -13,8 +13,14 @@ const SummaryPage = () => {
   }
 
   const handleSubmit = () => {
-    alert('Your test have been submitted successfully!')
+    alert('Your test has been submitted successfully!')
     navigate('/')
+  }
+
+  const renderAnswer = (value) => {
+    if (!value || value.length === 0) return <em>Not Answered</em>
+    if (Array.isArray(value)) return value.join(', ')
+    return value
   }
 
   return (
@@ -23,18 +29,24 @@ const SummaryPage = () => {
 
       <div className="summary-section">
         <div className="input-group">
-          <strong>Name:</strong> {userInfo.name}
+          <strong>Name:</strong> {userInfo.name || <em>Not provided</em>}
         </div>
         <div className="input-group">
-          <strong>Email:</strong> {userInfo.email}
+          <strong>Email:</strong> {userInfo.email || <em>Not provided</em>}
         </div>
 
-        {questions.flat().map((q) => (
-          <div className="input-group" key={q.id}>
-            <strong>{q.label}</strong>
-            <div>{answers[q.id] || <em>Not Answered</em>}</div>
-          </div>
-        ))}
+        {Object.values(questions).map((q) => {
+          const answer = answers[q.id]
+          if (answer) { 
+            return (
+              <div className="input-group" key={q.id}>
+                <strong>{q.question}</strong>
+                <div>{renderAnswer(answer)}</div>
+              </div>
+            )
+          }
+          return null
+        })}
       </div>
 
       <div className="button-group">

@@ -1,58 +1,62 @@
-
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useQuestionnaire } from '../../context/quizContext'
-import questions from '../../constant/questions'
+import questionBank from '../../constant/questions' // now an object, not array
 import ProgressBar from '../../components/progressBar/Progressbar'
 import QuestionCard from '../../components/card/QuestionCard'
 import NavigationButtons from '../../components/navigation/navigationButtons'
 import AnimatedWrapper from '../../components/animatedWrappers'
 import { validateQuestion } from '../../utils/validation'
-import './questionPage.css'
 
 const QuestionsPage = () => {
-
   const { answers, updateAnswer } = useQuestionnaire()
   const navigate = useNavigate()
-  const [step, setStep] = useState(0)
+  const [currentId, setCurrentId] = useState('q1')
+  const [history, setHistory] = useState([]) // For back button
   const [errors, setErrors] = useState({})
 
-  const currentStepQuestions = questions[step]
-  const totalSteps = questions.length
+  const currentQuestion = questionBank[currentId]
 
   const handleNext = () => {
-  
-    const newErrors = {}
-    currentStepQuestions.forEach((q) => {
-      const value = answers[q.id]
-      const errMsg = validateQuestion(q, value)
-      if (errMsg) newErrors[q.id] = errMsg
-    })
+    const value = answers[currentId]
+    const errMsg = validateQuestion(currentQuestion, value)
 
-    if (Object.keys(newErrors).length) {
-      setErrors(newErrors)
+    if (errMsg) {
+      setErrors({ [currentId]: errMsg })
       return
     }
 
     setErrors({})
-    if (step < totalSteps - 1) {
-      setStep((prev) => prev + 1)
+
+    // Get next based on value (for radio), or from question object
+    let nextId
+    if (currentQuestion.type === 'radio') {
+      const selected = currentQuestion.options.find(opt => opt.value === value)
+      nextId = selected?.next
     } else {
+      nextId = currentQuestion.next
+    }
+
+    if (!nextId) {
       navigate('/summary')
+    } else {
+      setHistory(prev => [...prev, currentId])
+      setCurrentId(nextId)
     }
   }
 
   const handlePrevious = () => {
-    if (step > 0) {
-      setErrors({})
-      setStep((prev) => prev - 1)
+    const prevId = history.pop()
+    if (prevId) {
+      setCurrentId(prevId)
+      setHistory([...history])
     }
   }
 
   const handleChange = (questionId, value) => {
     updateAnswer(questionId, value)
     if (errors[questionId]) {
-      setErrors((prev) => {
+      setErrors(prev => {
         const { [questionId]: _, ...rest } = prev
         return rest
       })
@@ -62,28 +66,25 @@ const QuestionsPage = () => {
   return (
     <AnimatedWrapper>
       <div className="form-container">
-        
-
         <div className="questions-section">
-          {currentStepQuestions.map((q) => (
-            <QuestionCard
-              key={q.id}
-              question={q}
-              value={answers[q.id] || ''}
-              onChange={(val) => handleChange(q.id, val)}
-              error={errors[q.id]}
-            />
-          ))}
+          <QuestionCard
+            key={currentQuestion.id}
+            question={currentQuestion}
+            value={answers[currentQuestion.id] || ''}
+            onChange={(val) => handleChange(currentQuestion.id, val)}
+            error={errors[currentQuestion.id]}
+          />
         </div>
 
         <NavigationButtons
           onNext={handleNext}
           onPrevious={handlePrevious}
-          isFirst={step === 0}
-          isLast={step === totalSteps - 1}
+          isFirst={history.length === 0}
+          isLast={!currentQuestion.next}
         />
       </div>
-      <ProgressBar currentStep={step + 1} totalSteps={totalSteps} />
+
+      <ProgressBar currentStep={history.length + 1} totalSteps={history.length + 2} />
     </AnimatedWrapper>
   )
 }
