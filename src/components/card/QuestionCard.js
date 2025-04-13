@@ -1,60 +1,86 @@
-import React from 'react'
-import './QuestionsCard.css'
+import React from 'react';
+import './QuestionsCard.css';
 
 const QuestionCard = ({ question, value, onChange, error }) => {
+  const isFirstStep = question.id === 'first-step'; // Adjust as needed
+  const inputType = isFirstStep ? "checkbox" : question.type;
+
+  const handleCheckboxChange = (e, optionValue) => {
+    const newVal = value || [];
+    if (e.target.checked) {
+      onChange([...newVal, optionValue]);
+    } else {
+      onChange(newVal.filter((v) => v !== optionValue));
+    }
+  };
+
   const renderOptions = () => {
     return question.options.map((option, index) => {
-      const display = typeof option === 'string' ? option : option.label
-      const optionValue = typeof option === 'string' ? option : option.value
+      const display = typeof option === 'string' ? option : option.label;
+      const optionValue = typeof option === 'string' ? option : option.value;
 
       return (
-        <label key={index}>
-          <input
-            type={question.type}
-            name={question.id}
-            value={optionValue}
-            checked={
-              question.type === 'checkbox'
-                ? (value || []).includes(optionValue)
-                : value === optionValue
-            }
-            onChange={(e) => {
-              if (question.type === 'checkbox') {
-                const newVal = value || []
-                if (e.target.checked) {
-                  onChange([...newVal, optionValue])
-                } else {
-                  onChange(newVal.filter((v) => v !== optionValue))
-                }
-              } else {
-                onChange(optionValue)
+        <div key={index} className="option">
+          <label>
+            <input
+              type={inputType}
+              name={question.id}
+              value={optionValue}
+              checked={
+                inputType === 'checkbox'
+                  ? (value || []).includes(optionValue)
+                  : value === optionValue
               }
-            }}
-          />
-          {display}
-        </label>
-      )
-    })
-  }
+              onChange={(e) =>
+                inputType === 'checkbox'
+                  ? handleCheckboxChange(e, optionValue)
+                  : onChange(optionValue)
+              }
+            />
+            {display}
+          </label>
+        </div>
+      );
+    });
+  };
+
+  const showValidationError =
+    inputType === 'checkbox' &&
+    isFirstStep &&
+    (!value || value.length === 0);
 
   return (
     <div className="question-card">
+      <h1 className="interactive-title">Smart QuizWise</h1>
       <p className="question-label">{question.question}</p>
-      {question.options ? (
-        <div className="options-wrapper">
-          {renderOptions()}
-        </div>
-      ) : (
+
+      {question.type === 'text' && (
         <input
           className="input"
           type="text"
-          value={value}
+          value={value || ''}
           onChange={(e) => onChange(e.target.value)}
         />
       )}
-      {error && <p className="error">{error}</p>}
-    </div>
-  )
-}
 
-export default QuestionCard
+      {question.type === 'date' && (
+        <input
+          className="input"
+          type="date"
+          value={value || ''}
+          onChange={(e) => onChange(e.target.value)}
+        />
+      )}
+
+      {(question.type === 'radio' || question.type === 'checkbox') && (
+        <div className="options-wrapper">{renderOptions()}</div>
+      )}
+
+      {(error || showValidationError) && (
+        <p className="error">{error || 'Please select at least one option.'}</p>
+      )}
+    </div>
+  );
+};
+
+export default QuestionCard;
