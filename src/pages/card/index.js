@@ -1,67 +1,89 @@
-import React, { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { useQuestionnaire } from '../../context/quizContext'
-import questionBank from '../../constant/questions' // now an object, not array
-import ProgressBar from '../../components/progressBar/Progressbar'
-import QuestionCard from '../../components/card/QuestionCard'
-import NavigationButtons from '../../components/navigation/navigationButtons'
-import AnimatedWrapper from '../../components/animatedWrappers'
-import { validateQuestion } from '../../utils/validation'
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useQuestionnaire } from '../../context/quizContext';
+import questionBank from '../../constant/questions';
+import ProgressBar from '../../components/progressBar/Progressbar';
+import QuestionCard from '../../components/card/QuestionCard';
+import NavigationButtons from '../../components/navigation/navigationButtons';
+import AnimatedWrapper from '../../components/animatedWrappers';
+import { validateQuestion } from '../../utils/validation';
 
 const QuestionsPage = () => {
-  const { answers, updateAnswer } = useQuestionnaire()
-  const navigate = useNavigate()
-  const [currentId, setCurrentId] = useState('q1')
-  const [history, setHistory] = useState([]) // For back button
-  const [errors, setErrors] = useState({})
+  const { answers, updateAnswer } = useQuestionnaire();
+  const navigate = useNavigate();
 
-  const currentQuestion = questionBank[currentId]
+  const [queue, setQueue] = useState(['q1']);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [errors, setErrors] = useState({});
 
-  const handleNext = () => {
-    const value = answers[currentId]
-    const errMsg = validateQuestion(currentQuestion, value)
-
-    if (errMsg) {
-      setErrors({ [currentId]: errMsg })
-      return
-    }
-
-    setErrors({})
-
-    // Get next based on value (for radio), or from question object
-    let nextId
-    if (currentQuestion.type === 'radio') {
-      const selected = currentQuestion.options.find(opt => opt.value === value)
-      nextId = selected?.next
-    } else {
-      nextId = currentQuestion.next
-    }
-
-    if (!nextId) {
-      navigate('/summary')
-    } else {
-      setHistory(prev => [...prev, currentId])
-      setCurrentId(nextId)
-    }
-  }
-
-  const handlePrevious = () => {
-    const prevId = history.pop()
-    if (prevId) {
-      setCurrentId(prevId)
-      setHistory([...history])
-    }
-  }
+  const currentId = queue[currentIndex];
+  const currentQuestion = questionBank[currentId];
 
   const handleChange = (questionId, value) => {
-    updateAnswer(questionId, value)
+    updateAnswer(questionId, value);
     if (errors[questionId]) {
       setErrors(prev => {
-        const { [questionId]: _, ...rest } = prev
-        return rest
-      })
+        const { [questionId]: _, ...rest } = prev;
+        return rest;
+      });
     }
-  }
+  };
+
+  const getNextIds = (question, value) => {
+    if (question.type === 'checkbox') {
+      const selectedOptions = value || [];
+      const nextSteps = selectedOptions.map(val => {
+        const opt = question.options.find(o => o.value === val);
+        return opt?.next;
+      }).filter(Boolean);
+      return Array.from(new Set(nextSteps)); // remove duplicates
+    }
+  
+    if (question.type === 'radio') {
+      const selected = question.options.find(opt => opt.value === value);
+      return selected?.next ? [selected.next] : [];
+    }
+  
+    // ✅ Add support for 'text', 'date', etc.
+    if (question.next) {
+      return [question.next];
+    }
+  
+    return [];
+  };
+  
+
+  const handleNext = () => {
+    const value = answers[currentId];
+    const errMsg = validateQuestion(currentQuestion, value);
+
+    if (errMsg) {
+      setErrors({ [currentId]: errMsg });
+      return;
+    }
+
+    setErrors({});
+
+    const nextIds = getNextIds(currentQuestion, value);
+
+    if (nextIds.length === 0) {
+      navigate('/summary');
+      return;
+    }
+
+    const newQueue = [...queue];
+    const nextToInsert = nextIds.filter(id => !queue.includes(id)); // avoid duplicates
+    newQueue.splice(currentIndex + 1, 0, ...nextToInsert);
+
+    setQueue(newQueue);
+    setCurrentIndex(prev => prev + 1);
+  };
+
+  const handlePrevious = () => {
+    if (currentIndex > 0) {
+      setCurrentIndex(prev => prev - 1);
+    }
+  };
 
   return (
     <AnimatedWrapper>
@@ -70,7 +92,7 @@ const QuestionsPage = () => {
           <QuestionCard
             key={currentQuestion.id}
             question={currentQuestion}
-            value={answers[currentQuestion.id] || ''}
+            value={answers[currentQuestion.id] || (currentQuestion.type === 'checkbox' ? [] : '')}
             onChange={(val) => handleChange(currentQuestion.id, val)}
             error={errors[currentQuestion.id]}
           />
@@ -79,14 +101,17 @@ const QuestionsPage = () => {
         <NavigationButtons
           onNext={handleNext}
           onPrevious={handlePrevious}
-          isFirst={history.length === 0}
-          isLast={!currentQuestion.next}
+          isFirst={currentIndex === 0}
+          isLast={currentIndex === queue.length - 1}
         />
       </div>
 
-      <ProgressBar currentStep={history.length + 1} totalSteps={history.length + 2} />
+      <ProgressBar
+        currentStep={Math.min(currentIndex, queue.length - 1)}
+        totalSteps={queue.length}
+      />
     </AnimatedWrapper>
-  )
-}
+  );
+};
 
-export default QuestionsPage
+export default QuestionsPage;
